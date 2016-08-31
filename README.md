@@ -3,13 +3,14 @@
 #### 2. [CoreText入坑一](http://wudb.leanote.com/post/CoreText%E5%85%A5%E5%9D%91%E4%B8%80)
 待续...
 
-欢迎拍砖, 我们来一起解决
+欢迎拍砖, 我们来一起解决        
 
-欢迎关注我的公众号
+欢迎关注我的公众号        	
+
 ![公众号](http://oc3j5gzq3.bkt.clouddn.com/2016-08-26-wechat_qrcode_300.jpg)
 
-个人博客:
-[博客](http://wudb.leanote.com/)
+个人博客:     
+[博客](http://wudb.leanote.com/)      
 [简书博客](http://www.jianshu.com/users/906b9252697d/latest_articles)
 
 
