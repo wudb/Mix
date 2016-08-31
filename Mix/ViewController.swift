@@ -14,7 +14,8 @@ class ViewController: UITableViewController {
 
     let sectionTitles = ["WebKit", "TextKit", "CoreText"]
     let cellModels = ["WebKit": [("WebView", "MixWebViewController")],
-                      "TextKit": [("Label", "MixLabelViewController"), ("TextView", "MixTextViewController"), ("TextView-Custom", "MixCustomTextViewController")]]
+                      "TextKit": [("Label", "MixLabelViewController"), ("TextView", "MixTextViewController"), ("TextView-Custom", "MixCustomTextViewController")],
+                      "CoreText": [("CoreText-1", "CoreText1ViewController")]]
 
 
     override func viewDidLoad() {
