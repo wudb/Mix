@@ -22,7 +22,7 @@ class CoreText1ViewController: UIViewController {
         self.view.addSubview(view)
         
         
-        let attributedText = NSMutableAttributedString(string: "Jacob was a year and a half older than I and seemed to enjoy reading my gestures and translating my needs to adults. He ensured that cartoons were viewed, cereal was served, and that all bubbles were stirred out of any remotely bubbly beverage intended for me. In our one-bedroom apartment in southern New Jersey, we didn’t have many toys. But I had a big brother and Jacob had a baby sister. We were ignorant of all the pressed plastic playthings we didn’t have.")
+        let attributedText = NSMutableAttributedString(string: "Jacob was a year and a half older than I and seemed to enjoy reading my gestures and translating my needs to adults. He ensured that cartoons were viewed, cereal was served, and that all bubbles were stirred out of any remotely bubbly beverage intended for me. In our one-bedroom apartment in southern New Jersey, we didn’t have many toys. http://wudb.leanote.com/, But I had a big brother and Jacob had a baby sister. We were ignorant of all the pressed plastic playthings we didn’t have. http://www.baidu.com/")
         
         // CoreText支持的属性
 
@@ -88,6 +88,11 @@ class CoreText1ViewController: UIViewController {
         attributedText.addAttributes(strikethroughStyle, range: NSMakeRange(150, 20))
         
         
+        // 背景色
+        attributedText.addAttribute(NSBackgroundColorAttributeName, value: UIColor.yellowColor(), range: NSMakeRange(20, 10))
+        
+        // 斜体
+        attributedText.addAttribute(NSFontAttributeName, value: UIFont.italicSystemFontOfSize(16), range: NSMakeRange(180, 10))
         
         
         // 文字书写方向
@@ -96,9 +101,6 @@ class CoreText1ViewController: UIViewController {
         
         // 横向拉伸文本
 //        attributedText.addAttribute(NSExpansionAttributeName, value: 3.0, range: NSMakeRange(110, 10))
-        
-        // 背景色
-//        attributedText.addAttribute(NSBackgroundColorAttributeName, value: UIColor.yellowColor(), range: NSMakeRange(30, 10))
         
         // 图片附件
 //        let imageAttachment = NSTextAttachment()
@@ -125,6 +127,12 @@ class CoreText1ViewController: UIViewController {
         
         
         view.attributedText = attributedText
+        
+        view.autoDetectLinks = true
+        
+        view.touchLinkCallback = { link in
+            print("touch link: \(link)")
+        }
     }
 
     override func didReceiveMemoryWarning() {
