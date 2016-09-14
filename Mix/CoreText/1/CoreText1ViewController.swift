@@ -130,8 +130,10 @@ class CoreText1ViewController: UIViewController {
         
         view.autoDetectLinks = true
         
-        view.touchLinkCallback = { link in
-            print("touch link: \(link)")
+        view.touchLinkCallback = { [unowned self] link in
+            UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet).cancel("Cancel").default_(link) { _ in
+                UIApplication.sharedApplication().openURL(NSURL(string: link)!)
+            }.show(self, animated: true)
         }
     }
 
