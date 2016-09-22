@@ -121,7 +121,9 @@ class CoreText1ViewController: UIViewController {
         
         view.attributedText = attributedText
         
+        
         view.autoDetectLinks = true
+        
         
         view.hyperlinkMapper = ["Zhihu": "https://www.zhihu.com/",  "Jianshu": "http://www.jianshu.com/users/906b9252697d/latest_articles"]
         
@@ -130,6 +132,7 @@ class CoreText1ViewController: UIViewController {
                 UIApplication.sharedApplication().openURL(NSURL(string: link)!)
                 }.show(self, animated: true)
         }
+        
         
         // 图片附件
         let imageName = "catanddog"

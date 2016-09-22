@@ -133,7 +133,7 @@ class TULabel: UIView {
         } else if nil != attributes[NSBackgroundColorAttributeName] { // 背景色
             fillBackgroundColor(run, attributes: attributes, context: context)
             CTRunDraw(run, context, CFRangeMake(0, 0))
-        } else if nil != attributes[TUImageAttachmentAttributeName] {
+        } else if nil != attributes[TUImageAttachmentAttributeName] { // 绘制图片
             drawImage(run, attributes: attributes, context: context)
         } else {
             CTRunDraw(run, context, CFRangeMake(0, 0))
@@ -218,22 +218,25 @@ class TULabel: UIView {
     
     // 填充背景色
     func fillBackgroundColor(run: CTRun, attributes: NSDictionary, context: CGContext) {
+        // 获取设置的背景色
         let backgroundColor = attributes[NSBackgroundColorAttributeName]
         guard let color = backgroundColor else {
             return
         }
         
+        // 获取画线的起点
         let origin = getRunOrigin(run)
         
-        let font = getRunFont(attributes)
-        
+        // 获取Run的宽度, ascent, descent
         var ascent = CGFloat(), descent = CGFloat(), leading = CGFloat()
         let typographicWidth = CGFloat(CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, &leading))
         
         let pt = CGContextGetTextPosition(context)
         
-        let rect = CGRectMake(origin.x + pt.x, pt.y + origin.y - descent, typographicWidth, font.xHeight + ascent + descent)
+        // 需要填充颜色的区域
+        let rect = CGRectMake(origin.x + pt.x, pt.y + origin.y - descent, typographicWidth, ascent + descent)
         
+        // 开始填充颜色
         let components = CGColorGetComponents(color.CGColor)
         CGContextSetRGBFillColor(context, components[0], components[1], components[2], components[3])
         CGContextFillRect(context, rect)
@@ -252,14 +255,15 @@ class TULabel: UIView {
         let text = NSMutableAttributedString(attributedString: attrText)
         
         attachments.forEach { attach in
-            text.insertAttributedString(imageAttribute(for: attach), atIndex: attach.location)
+            text.insertAttributedString(imageAttribute(attach), atIndex: attach.location)
         }
         
         return text
     }
     
     // 插入图片样式
-    func imageAttribute(for attachment: TUImageAttachment) -> NSAttributedString {
+    func imageAttribute(attachment: TUImageAttachment) -> NSAttributedString {
+        // 定义RunDelegateCallback并实现
         var imageCallback = CTRunDelegateCallbacks(version: kCTRunDelegateVersion1, dealloc: { pointer in
                 pointer.dealloc(1)
             }, getAscent: { pointer -> CGFloat in
@@ -270,13 +274,17 @@ class TULabel: UIView {
                 return UnsafePointer<UIImage>(pointer).memory.size.width
         })
         
+        // 创建RunDelegate, 传入callback中图片数据
         let pointer = UnsafeMutablePointer<UIImage>.alloc(1)
         pointer.initialize(attachment.image!)
         let runDelegate = CTRunDelegateCreate(&imageCallback, pointer)
         
         //0xFFFC
+        // 为每个图片创建一个空的string占位
         let imageAttributedString = NSMutableAttributedString(string: " ")
         imageAttributedString.addAttribute(kCTRunDelegateAttributeName as String, value: runDelegate!, range: NSMakeRange(0, 1))
+        
+        // 将附件作为指定属性的值
         imageAttributedString.addAttribute(TUImageAttachmentAttributeName, value: attachment, range: NSMakeRange(0, 1))
         
         return imageAttributedString
@@ -284,11 +292,13 @@ class TULabel: UIView {
     
     // 画图片
     func drawImage(run: CTRun, attributes: NSDictionary, context: CGContext) {
+        // 获取对应图片属性的附件
         let imageAttachment = attributes[TUImageAttachmentAttributeName]
         guard let attachment = imageAttachment else {
             return
         }
         
+        // 计算绘制图片的区域
         let origin = getRunOrigin(run)
         
         var ascent = CGFloat(), descent = CGFloat(), leading = CGFloat()
@@ -300,6 +310,8 @@ class TULabel: UIView {
         
         let image = (attachment as! TUImageAttachment).image
         rect.size = image!.size
+        
+        // 绘制图片
         CGContextDrawImage(context, rect, image!.CGImage!)
     }
     
@@ -309,8 +321,10 @@ class TULabel: UIView {
             return
         }
         
+        // 定义识别器类型
         let linkDetector = try! NSDataDetector(types: NSTextCheckingType.Link.rawValue)
         
+        // 将匹配的类型存储到一个数组中
         let content = text.string
         self.detectLinkList = linkDetector.matchesInString(content, options: NSMatchingOptions.ReportProgress, range: NSMakeRange(0, content.characters.count))
     }
@@ -318,13 +332,14 @@ class TULabel: UIView {
     // 给链接增加样式
     func addLinkStyle(attributedText: NSAttributedString?, links: [NSTextCheckingResult]?) -> NSAttributedString? {
         guard let linkList = links else {
-            return nil
+            return attributedText
         }
         
         guard let text = attributedText else {
-            return nil
+            return attributedText
         }
         
+        // 遍历链接列表, 增加指定样式
         let attrText = NSMutableAttributedString(attributedString: text)
         linkList.forEach { [unowned self] result in
             attrText.addAttributes([NSForegroundColorAttributeName: self.linkColor,
@@ -451,6 +466,7 @@ class TULabel: UIView {
             let touch: UITouch = touches.first!
             let point = touch.locationInView(self)
             
+            // 获取点击位置对应富文本的位置
             let index = attributedIndexAtPoint(point)
             
             // 点击了文本链接
@@ -464,6 +480,7 @@ class TULabel: UIView {
             
             // 点击了自动识别的链接
             if self.autoDetectLinks {
+                // 根据index找链接
                 let foundLink = linkAtIndex(index)
                 
                 if nil != foundLink.foundLink  {
