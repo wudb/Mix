@@ -10,6 +10,7 @@
 		3D1DE7EB1D89385C00DE90C7 /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1DE7EA1D89385C00DE90C7 /* UIAlertController+Extension.swift */; };
 		3D4FFF641D7414BB00AC9AB3 /* CoreText1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4FFF631D7414BB00AC9AB3 /* CoreText1ViewController.swift */; };
 		3D4FFF661D7414E800AC9AB3 /* TULabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4FFF651D7414E800AC9AB3 /* TULabel.swift */; };
+		3D77D7611D93851B00724D40 /* TUImageAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D77D7601D93851B00724D40 /* TUImageAttachment.swift */; };
 		3DB3BC0C1D644EF000104D3B /* MixLabelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB3BC0B1D644EF000104D3B /* MixLabelViewController.swift */; };
 		3DB3BC0E1D65B4BB00104D3B /* MixTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB3BC0D1D65B4BB00104D3B /* MixTextViewController.swift */; };
 		3DB3BC131D6BE0B500104D3B /* MixCustomTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB3BC121D6BE0B500104D3B /* MixCustomTextViewController.swift */; };
@@ -44,6 +45,7 @@
 		3D1DE7EA1D89385C00DE90C7 /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		3D4FFF631D7414BB00AC9AB3 /* CoreText1ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreText1ViewController.swift; sourceTree = "<group>"; };
 		3D4FFF651D7414E800AC9AB3 /* TULabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TULabel.swift; sourceTree = "<group>"; };
+		3D77D7601D93851B00724D40 /* TUImageAttachment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TUImageAttachment.swift; sourceTree = "<group>"; };
 		3DB3BC0B1D644EF000104D3B /* MixLabelViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MixLabelViewController.swift; sourceTree = "<group>"; };
 		3DB3BC0D1D65B4BB00104D3B /* MixTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MixTextViewController.swift; sourceTree = "<group>"; };
 		3DB3BC121D6BE0B500104D3B /* MixCustomTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MixCustomTextViewController.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 		3D4FFF601D74149C00AC9AB3 /* 1 */ = {
 			isa = PBXGroup;
 			children = (
+				3D77D7601D93851B00724D40 /* TUImageAttachment.swift */,
 				3D4FFF631D7414BB00AC9AB3 /* CoreText1ViewController.swift */,
 				3D4FFF651D7414E800AC9AB3 /* TULabel.swift */,
 			);
@@ -332,6 +335,7 @@
 				3DB3BC0C1D644EF000104D3B /* MixLabelViewController.swift in Sources */,
 				3DB3BC131D6BE0B500104D3B /* MixCustomTextViewController.swift in Sources */,
 				668F3FD8EF3BD9F8C7A49EE0 /* AppDelegate.swift in Sources */,
+				3D77D7611D93851B00724D40 /* TUImageAttachment.swift in Sources */,
 				668F365E98F1620497730C31 /* ViewController.swift in Sources */,
 				3D4FFF641D7414BB00AC9AB3 /* CoreText1ViewController.swift in Sources */,
 				3DB3BC0E1D65B4BB00104D3B /* MixTextViewController.swift in Sources */,
@@ -449,6 +453,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.Mix;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -473,6 +478,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.Mix;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};

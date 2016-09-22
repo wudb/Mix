@@ -17,16 +17,25 @@ class TULabel: UIView {
     // 检测到的链接
     private var detectLinkList: [NSTextCheckingResult]?
     
+    // 文本链接对应的范围
+    private var hyperlinkRangeMapper: [String: String] = [:]
+    
     var attributedText: NSAttributedString?
     
     // 是否自动检测链接, default is false
     var autoDetectLinks = false
+    
+    // 指定文本链接映射关系
+    var hyperlinkMapper: [String: String]?
     
     // 链接显示颜色
     var linkColor = UIColor.blueColor()
     
     // 点击链接的回调
     var touchLinkCallback: TouchLinkEvent?
+    
+    // 图片附件数组
+    var imageAttachments: [TUImageAttachment]?
     
     
     // Only override drawRect: if you perform custom drawing.
@@ -36,6 +45,14 @@ class TULabel: UIView {
         if self.autoDetectLinks {
             detectLinks()
             self.attributedText = addLinkStyle(self.attributedText, links: self.detectLinkList)
+        }
+        
+        if nil != self.hyperlinkMapper {
+            self.attributedText = addHyperlinkStyle(self.attributedText, links: self.hyperlinkMapper)
+        }
+        
+        if let attributedString = checkImage(self.attributedText) {
+            self.attributedText = attributedString
         }
         
         guard let text = self.attributedText else {
@@ -116,6 +133,8 @@ class TULabel: UIView {
         } else if nil != attributes[NSBackgroundColorAttributeName] { // 背景色
             fillBackgroundColor(run, attributes: attributes, context: context)
             CTRunDraw(run, context, CFRangeMake(0, 0))
+        } else if nil != attributes[TUImageAttachmentAttributeName] {
+            drawImage(run, attributes: attributes, context: context)
         } else {
             CTRunDraw(run, context, CFRangeMake(0, 0))
         }
@@ -132,7 +151,7 @@ class TULabel: UIView {
             CTRunGetPositions(run, CFRangeMake(0, 0), positions)
             origin = positions.memory
             
-            positions.destroy()
+            positions.dealloc(1)
         } else {
             origin = firstGlyphPosition.memory
         }
@@ -220,6 +239,70 @@ class TULabel: UIView {
         CGContextFillRect(context, rect)
     }
     
+    // 检测是否有图片
+    func checkImage(attributedText: NSAttributedString?) -> NSAttributedString? {
+        guard let attrText = attributedText else {
+            return attributedText
+        }
+        
+        guard let attachments = self.imageAttachments else {
+            return attrText
+        }
+        
+        let text = NSMutableAttributedString(attributedString: attrText)
+        
+        attachments.forEach { attach in
+            text.insertAttributedString(imageAttribute(for: attach), atIndex: attach.location)
+        }
+        
+        return text
+    }
+    
+    // 插入图片样式
+    func imageAttribute(for attachment: TUImageAttachment) -> NSAttributedString {
+        var imageCallback = CTRunDelegateCallbacks(version: kCTRunDelegateVersion1, dealloc: { pointer in
+                pointer.dealloc(1)
+            }, getAscent: { pointer -> CGFloat in
+                return UnsafePointer<UIImage>(pointer).memory.size.height / 2
+            }, getDescent: { pointer -> CGFloat in
+                return UnsafePointer<UIImage>(pointer).memory.size.height / 2
+            }, getWidth: { pointer -> CGFloat in
+                return UnsafePointer<UIImage>(pointer).memory.size.width
+        })
+        
+        let pointer = UnsafeMutablePointer<UIImage>.alloc(1)
+        pointer.initialize(attachment.image!)
+        let runDelegate = CTRunDelegateCreate(&imageCallback, pointer)
+        
+        //0xFFFC
+        let imageAttributedString = NSMutableAttributedString(string: " ")
+        imageAttributedString.addAttribute(kCTRunDelegateAttributeName as String, value: runDelegate!, range: NSMakeRange(0, 1))
+        imageAttributedString.addAttribute(TUImageAttachmentAttributeName, value: attachment, range: NSMakeRange(0, 1))
+        
+        return imageAttributedString
+    }
+    
+    // 画图片
+    func drawImage(run: CTRun, attributes: NSDictionary, context: CGContext) {
+        let imageAttachment = attributes[TUImageAttachmentAttributeName]
+        guard let attachment = imageAttachment else {
+            return
+        }
+        
+        let origin = getRunOrigin(run)
+        
+        var ascent = CGFloat(), descent = CGFloat(), leading = CGFloat()
+        let typographicWidth = CGFloat(CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, &leading))
+        
+        let pt = CGContextGetTextPosition(context)
+        
+        var rect = CGRect(x: origin.x + pt.x, y: pt.y + origin.y - descent, width: typographicWidth, height: ascent + descent)
+        
+        let image = (attachment as! TUImageAttachment).image
+        rect.size = image!.size
+        CGContextDrawImage(context, rect, image!.CGImage!)
+    }
+    
     // 检测链接
     func detectLinks() {
         guard let text = self.attributedText else {
@@ -251,7 +334,7 @@ class TULabel: UIView {
         return attrText
     }
     
-    //
+    // 获取行的区域
     func getLineRect(line: CTLine, origin: CGPoint) -> CGRect {
         var ascent = CGFloat(), descent = CGFloat(), leading = CGFloat()
         let width = CGFloat(CTLineGetTypographicBounds(line, &ascent, &descent, &leading));
@@ -318,23 +401,82 @@ class TULabel: UIView {
         return (nil, nil)
     }
     
+    // 给指定链接的文本添加样式
+    func addHyperlinkStyle(attributedText: NSAttributedString?, links: [String: String]?) -> NSAttributedString? {
+        guard let linkList = links else {
+            return attributedText
+        }
+        
+        guard let text = attributedText else {
+            return attributedText
+        }
+        
+        let attrText = NSMutableAttributedString(attributedString: text)
+        self.hyperlinkRangeMapper.removeAll()
+        
+        linkList.forEach { [unowned self] result in
+            let attrString = attrText.string as NSString
+            let range = attrString.rangeOfString(result.0)
+            if range.location != NSNotFound {
+                attrText.addAttributes([NSForegroundColorAttributeName: self.linkColor,
+                    NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue,
+                    NSUnderlineColorAttributeName: self.linkColor], range: range)
+                
+                self.hyperlinkRangeMapper[result.0] = NSStringFromRange(range)
+            }
+        }
+        
+        return attrText
+    }
+    
+    // 判断点击的位置是不是链接
+    func hyperlinkAtIndex(index: CFIndex) -> String? {
+        guard let linkMapper = self.hyperlinkMapper else {
+            return nil
+        }
+        
+        var link: String?
+        self.hyperlinkRangeMapper.forEach { result in
+            let range = NSRangeFromString(result.1)
+            if NSLocationInRange(index, range) {
+                link = linkMapper[result.0]
+                return
+            }
+        }
+        return link
+    }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if self.autoDetectLinks {
+        if self.autoDetectLinks || nil != self.hyperlinkMapper {
             let touch: UITouch = touches.first!
             let point = touch.locationInView(self)
             
-            let foundLink = linkAtIndex(attributedIndexAtPoint(point))
+            let index = attributedIndexAtPoint(point)
             
-            if nil != foundLink.foundLink  {
-                guard let link = foundLink.link else {
-                    return
-                }
-                
-                if let touchLink = self.touchLinkCallback {
-                    touchLink(link: link)
+            // 点击了文本链接
+            if nil != self.hyperlinkMapper {
+                let link = hyperlinkAtIndex(index)
+                if nil != link && nil != self.touchLinkCallback {
+                    self.touchLinkCallback!(link: link!)
                 }
             }
+            
+            
+            // 点击了自动识别的链接
+            if self.autoDetectLinks {
+                let foundLink = linkAtIndex(index)
+                
+                if nil != foundLink.foundLink  {
+                    guard let link = foundLink.link else {
+                        return
+                    }
+                    
+                    if let touchLink = self.touchLinkCallback {
+                        touchLink(link: link)
+                    }
+                }
+            }
+            
         }
     }
     

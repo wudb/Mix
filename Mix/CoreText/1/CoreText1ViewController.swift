@@ -22,7 +22,7 @@ class CoreText1ViewController: UIViewController {
         self.view.addSubview(view)
         
         
-        let attributedText = NSMutableAttributedString(string: "Jacob was a year and a half older than I and seemed to enjoy reading my gestures and translating my needs to adults. He ensured that cartoons were viewed, cereal was served, and that all bubbles were stirred out of any remotely bubbly beverage intended for me. In our one-bedroom apartment in southern New Jersey, we didn’t have many toys. http://wudb.leanote.com/, But I had a big brother and Jacob had a baby sister. We were ignorant of all the pressed plastic playthings we didn’t have. http://www.baidu.com/")
+        let attributedText = NSMutableAttributedString(string: "Jacob was a year and a half older than I and seemed to enjoy reading my gestures and translating my needs to adults. He ensured that cartoons were viewed, cereal was served, and that all bubbles were stirred out of any remotely bubbly beverage intended for me. In our one-bedroom apartment in southern New Jersey, Zhihu, we didn’t have many toys. http://wudb.leanote.com/, But I had a big brother and 😳😊😳😊😳😊😳 Jacob had a baby sister. Jianshu, We were ignorant http://www.baidu.com/ of all the pressed plastic playthings we didn’t have.")
         
         // CoreText支持的属性
 
@@ -102,13 +102,6 @@ class CoreText1ViewController: UIViewController {
         // 横向拉伸文本
 //        attributedText.addAttribute(NSExpansionAttributeName, value: 3.0, range: NSMakeRange(110, 10))
         
-        // 图片附件
-//        let imageAttachment = NSTextAttachment()
-//        imageAttachment.image = UIImage(named: "catanddog")
-//        // 调整图片位置到中间
-//        imageAttachment.bounds = CGRectMake(0, -imageAttachment.image!.size.height / 2, imageAttachment.image!.size.width, imageAttachment.image!.size.height)
-//        attributedText.insertAttributedString(NSAttributedString(attachment: imageAttachment), atIndex: 50)
-        
         // 斜体
 //        attributedText.addAttribute(NSObliquenessAttributeName, value: 1, range: NSMakeRange(10, 10))
         
@@ -130,11 +123,22 @@ class CoreText1ViewController: UIViewController {
         
         view.autoDetectLinks = true
         
+        view.hyperlinkMapper = ["Zhihu": "https://www.zhihu.com/",  "Jianshu": "http://www.jianshu.com/users/906b9252697d/latest_articles"]
+        
         view.touchLinkCallback = { [unowned self] link in
             UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet).cancel("Cancel").default_(link) { _ in
                 UIApplication.sharedApplication().openURL(NSURL(string: link)!)
-            }.show(self, animated: true)
+                }.show(self, animated: true)
         }
+        
+        // 图片附件
+        let imageName = "catanddog"
+        let image = UIImage(named: imageName)
+        let imageAttachment = TUImageAttachment(name: imageName, location: 230)
+        
+        // 调整图片位置到中间
+        imageAttachment.bounds = CGRect(x: 0, y: -image!.size.height / 2, width: image!.size.width, height: image!.size.height)
+        view.imageAttachments = [imageAttachment]
     }
 
     override func didReceiveMemoryWarning() {
